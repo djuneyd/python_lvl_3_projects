@@ -1,5 +1,5 @@
 import config
-import os
+from class_dz import Dog
 print('Bot is active!')
 
 #!/usr/bin/python
@@ -19,12 +19,22 @@ bot = telebot.TeleBot(API_TOKEN)
 def send_welcome(message):
     bot.reply_to(message, """\
 Привет, я ЭхоБот.
-Я здесь, чтобы повторить ваши добрые слова в ваш адрес. Просто скажи что-нибудь приятное, и я скажу тебе то же самое!\
+Я здесь, чтобы повторить ваши добрые слова в ваш адрес. Просто скажи что-нибудь приятное, и я скажу тебе то же самое!😎\
+""")
+    bot.reply_to(message, """\
+Если хотите сделать собачку, то используйте команду /dog и рядом допишите имя, породу и характер собачки😋\
 """)
 
 @bot.message_handler(commands=['info'])
 def send_welcome(message):
     bot.reply_to(message, 'Я повторюша дядя хрюша🐷')
+
+@bot.message_handler(commands=['dog'])
+def send_welcome(message):
+    arguments = telebot.util.extract_arguments(message.text)
+    arguments = arguments.split(' ')
+    bobby = Dog(arguments[0], arguments[1], arguments[2])
+    bot.reply_to(message, bobby.info())
 
 @bot.message_handler(content_types=['photo'])
 def photo(message):   
