@@ -1,5 +1,6 @@
 import config
 from class_dz import Dog
+import random
 print('Bot is active!')
 
 #!/usr/bin/python
@@ -22,7 +23,13 @@ def send_welcome(message):
 Я здесь, чтобы повторить ваши добрые слова в ваш адрес. Просто скажи что-нибудь приятное, и я скажу тебе то же самое!😎\
 """)
     bot.reply_to(message, """\
-Если хотите сделать собачку, то используйте команду /dog и рядом допишите имя, породу и характер собачки😋\
+НЕКОТОРЫЕ КОМАНДЫ!😉
+/dog - сделать собачку, рядом укажите имя, породу и характер🐶
+/dice - кинуть игральную кость🎲
+/info - информация о боте😊
+/help - помощь с командами❤\
+                 
+Бот также пересылает вам картинки которые вы ему отправляете😁
 """)
 
 @bot.message_handler(commands=['info'])
@@ -35,6 +42,18 @@ def send_welcome(message):
     arguments = arguments.split(' ')
     bobby = Dog(arguments[0], arguments[1], arguments[2])
     bot.reply_to(message, bobby.info())
+
+stickers = ['CAACAgIAAxkBAAEMB2BmMTRrAAGUBjrhLQWylq4k_9HU-YQAAosVAALvokhL3DAhhLVmmaA0BA',
+            'CAACAgIAAxkBAAEMB2JmMTRx5zoGBuExLcmX0L-jXN7FRAACzxEAAlKRQEtOAAGmnvjK7y80BA',
+            'CAACAgIAAxkBAAEMB2VmMTR2Acjyi9Q0hfAAARa60VLory4AAkARAAIjrEFLq5rcPQrrUd80BA',
+            'CAACAgIAAxkBAAEMB2dmMTR5VDH774vVy7I9FRt4u-_K3wACcREAAuzsQUu1GqzW_T-jpDQE',
+            'CAACAgIAAxkBAAEMB2pmMTR8PBGoIUvABEz3n0QfQdr3kAACoQ8AAkG1QUtuwcKEzQGhITQE',
+            'CAACAgIAAxkBAAEMB3BmMTR_48NtSA62WmzZMRGoIVciRQAC9g0AAvetSEtWDywqQrcoYzQE']
+
+@bot.message_handler(commands=['dice'])
+def send_welcome(message):
+    global stickers
+    bot.send_sticker(message.chat.id, random.choice(stickers))
 
 @bot.message_handler(content_types=['photo'])
 def photo(message):   
