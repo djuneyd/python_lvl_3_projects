@@ -33,11 +33,11 @@ def send_welcome(message):
 """)
 
 @bot.message_handler(commands=['info'])
-def send_welcome(message):
+def information(message):
     bot.reply_to(message, 'Я повторюша дядя хрюша🐷')
 
 @bot.message_handler(commands=['dog'])
-def send_welcome(message):
+def dog_creator(message):
     arguments = telebot.util.extract_arguments(message.text)
     arguments = arguments.split(' ')
     bobby = Dog(arguments[0], arguments[1], arguments[2])
@@ -51,7 +51,7 @@ stickers = ['CAACAgIAAxkBAAEMB2BmMTRrAAGUBjrhLQWylq4k_9HU-YQAAosVAALvokhL3DAhhLV
             'CAACAgIAAxkBAAEMB3BmMTR_48NtSA62WmzZMRGoIVciRQAC9g0AAvetSEtWDywqQrcoYzQE']
 
 @bot.message_handler(commands=['dice'])
-def send_welcome(message):
+def throw_a_dice(message):
     global stickers
     bot.send_sticker(message.chat.id, random.choice(stickers))
 
