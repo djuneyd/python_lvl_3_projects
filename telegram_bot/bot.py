@@ -33,10 +33,12 @@ def send_welcome(message):
 Я также пересылаю вам картинки которые вы мне отправляете😁
 """)
 
+#get info
 @bot.message_handler(commands=['info'])
 def information(message):
     bot.reply_to(message, 'Я повторюша дядя хрюша🐷')
 
+#make a doggy
 @bot.message_handler(commands=['dog'])
 def dog_creator(message):
     arguments = telebot.util.extract_arguments(message.text)
@@ -44,6 +46,8 @@ def dog_creator(message):
     bobby = Dog(arguments[0], arguments[1], arguments[2])
     bot.reply_to(message, bobby.info())
 
+
+#throw a dice
 stickers = ['CAACAgIAAxkBAAEMB2BmMTRrAAGUBjrhLQWylq4k_9HU-YQAAosVAALvokhL3DAhhLVmmaA0BA',
             'CAACAgIAAxkBAAEMB2JmMTRx5zoGBuExLcmX0L-jXN7FRAACzxEAAlKRQEtOAAGmnvjK7y80BA',
             'CAACAgIAAxkBAAEMB2VmMTR2Acjyi9Q0hfAAARa60VLory4AAkARAAIjrEFLq5rcPQrrUd80BA',
@@ -56,6 +60,7 @@ def throw_a_dice(message):
     global stickers
     bot.send_sticker(message.chat.id, random.choice(stickers))
 
+#clear ban function
 @bot.message_handler(commands=['ban'])
 def ban_user(message):
     if message.reply_to_message: #проверка на то, что эта команда была вызвана в ответ на сообщение 
@@ -68,10 +73,11 @@ def ban_user(message):
             bot.reply_to(message, "Невозможно забанить администратора.")
         else:
             bot.ban_chat_member(chat_id, user_id) # пользователь с user_id будет забанен в чате с chat_id
-            bot.reply_to(message, f"Пользователь @{message.reply_to_message.from_user.username} был забанен.")
+            bot.reply_to(message, f"Пользователь @{message.reply_to_message.from_user.username} был забанен, пока!😁")
     else:
         bot.reply_to(message, "Эта команда должна быть использована в ответ на сообщение пользователя, которого вы хотите забанить.")
 
+#resender photos
 @bot.message_handler(content_types=['photo'])
 def photo(message):   
     fileID = message.photo[-1].file_id   
@@ -83,7 +89,13 @@ def photo(message):
     bot.send_photo(message.chat.id, photo)
     bot.send_message(message.chat.id, 'Я знаю что ты мне кидаешь😉')
 
-# Handle all other messages with content_type 'text' (content_types defaults to ['text'])
+#new members
+@bot.message_handler(content_types=['new_chat_members'])
+def make_some(message):
+    bot.send_message(message.chat.id, 'Я принял нового участника!🥰')
+    bot.approve_chat_join_request(message.chat.id, message.from_user.id)
+
+# Handle all other messages with content_type 'text' (content_types defaults to ['text']) and ban function for links
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
     print('was')
