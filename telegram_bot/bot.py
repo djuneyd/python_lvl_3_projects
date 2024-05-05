@@ -98,7 +98,6 @@ def make_some(message):
 # Handle all other messages with content_type 'text' (content_types defaults to ['text']) and ban function for links
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
-    print('was')
     if 'https://' in message.text:
         chat_id = message.chat.id # сохранение id чата
          # сохранение id и статуса пользователя, отправившего сообщение
