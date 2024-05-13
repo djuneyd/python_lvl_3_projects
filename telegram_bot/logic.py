@@ -11,6 +11,7 @@ class Pokemon:
         self.pokemon_number = randint(1,1000)
         self.img = self.get_img()
         self.name = self.get_name()
+        self.level = 0
 
         Pokemon.pokemons[pokemon_trainer] = self
 
@@ -43,6 +44,9 @@ class Pokemon:
     # Метод класса для получения картинки покемона
     def show_img(self):
         return self.img
+
+    def lvl(self):
+        return self.level
 
 pokemonchik = Pokemon(1)
 print(pokemonchik.img)

@@ -1,6 +1,7 @@
 import config
 from class_dz import Dog
 import random
+from logic import Pokemon
 print('Bot is active!')
 
 #!/usr/bin/python
@@ -28,7 +29,8 @@ def send_welcome(message):
 /dice - кинуть игральную кость🎲
 /ban - забанить участника группы в ответ на его сообщение💩
 /info - информация о боте😊
-/help - помощь с командами❤\
+/help - помощь с командами❤
+/go - ИГРА В POKEMON GO!🤩\
                  
 Я также пересылаю вам картинки которые вы мне отправляете😁
 """)
@@ -95,9 +97,42 @@ def make_some(message):
     bot.send_message(message.chat.id, 'Я принял нового участника!🥰')
     bot.approve_chat_join_request(message.chat.id, message.from_user.id)
 
+snacks = 0
+counter = 0
+pokemon = 0
+@bot.message_handler(commands=['go'])
+def go(message):
+    global snacks, pokemon
+    if message.from_user.username not in Pokemon.pokemons.keys():
+        pokemon = Pokemon(message.from_user.username)
+        bot.send_message(message.chat.id, pokemon.info())
+        bot.send_message(message.chat.id, 'Обычная версия')
+        bot.send_photo(message.chat.id, pokemon.show_img()[0])
+        bot.send_message(message.chat.id, 'Светящаяся версия')
+        bot.send_photo(message.chat.id, pokemon.show_img()[1])
+        bot.send_message(message.chat.id, f'Левел покемона: {pokemon.lvl()}')
+        bot.send_message(message.chat.id, f'Количество вкусняшек: {snacks}. Чтобы получить вкусняшку, напишите "ВКУСНЯШКА" 10 раз. (с их помощью можно улучшать покемона)')
+        bot.send_message(message.chat.id, f'Прокачать левел: /lvlup')
+    else:
+        bot.reply_to(message, "Ты уже создал себе покемона")
+
+@bot.message_handler(commands=['lvlup'])
+def lvlup(message):
+    global snacks, pokemon
+    if message.from_user.username in Pokemon.pokemons.keys() and snacks > 0:
+        pokemon.level += 1
+        snacks -= 1
+        bot.send_message(message.chat.id, f'Левел покемона повышен!')
+        bot.send_message(message.chat.id, f'Левел покемона: {pokemon.lvl()}')
+        bot.send_message(message.chat.id, f'Количество вкусняшек: {snacks}. Чтобы получить вкусняшку, напишите "ВКУСНЯШКА" 10 раз. (с их помощью можно улучшать покемона)')
+        bot.send_message(message.chat.id, f'Прокачать левел: /lvlup')
+    else:
+        bot.send_message(message.chat.id, f'НЕДОСТАТОЧНО ВКУСНЯШЕК ИЛИ НЕТУ ПОКЕМОНА!')
+
 # Handle all other messages with content_type 'text' (content_types defaults to ['text']) and ban function for links
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
+    global counter, snacks
     if 'https://' in message.text:
         chat_id = message.chat.id # сохранение id чата
          # сохранение id и статуса пользователя, отправившего сообщение
@@ -108,8 +143,17 @@ def echo_message(message):
         else:
             bot.ban_chat_member(chat_id, user_id) # пользователь с user_id будет забанен в чате с chat_id
             bot.reply_to(message, f"Пользователь @{message.reply_to_message.from_user.username} был забанен за отправку подозрительных ссылок.")
+    elif message.text == 'ВКУСНЯШКА':
+        counter+=1
     else:
         bot.reply_to(message, message.text)
+    if counter == 10:
+        snacks+=1
+        counter = 0
+        bot.send_message(message.chat.id, f'Получена вкусняшка!')
+        bot.send_message(message.chat.id, f'Количество вкусняшек: {snacks}. Чтобы получить вкусняшку, напишите "ВКУСНЯШКА" 10 раз. (с их помощью можно улучшать покемона)')
+        bot.send_message(message.chat.id, f'Прокачать левел: /lvlup')
+    
     print(message.text)
 
 
