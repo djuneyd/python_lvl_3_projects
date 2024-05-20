@@ -1,7 +1,7 @@
 import config
 from class_dz import Dog
 import random
-from logic import Pokemon
+from logic import Pokemon, Wizard, Fighter
 print('Bot is active!')
 
 #!/usr/bin/python
@@ -104,28 +104,49 @@ pokemon = 0
 def go(message):
     global snacks, pokemon
     if message.from_user.username not in Pokemon.pokemons.keys():
-        pokemon = Pokemon(message.from_user.username)
+        chance = random.randint(1,3)
+        if chance == 1:
+            pokemon = Pokemon(message.from_user.username)
+        elif chance == 2:
+            pokemon = Wizard(message.from_user.username)
+        elif chance == 3:
+            pokemon = Fighter(message.from_user.username)
         bot.send_message(message.chat.id, pokemon.info())
         bot.send_message(message.chat.id, 'Обычная версия')
         bot.send_photo(message.chat.id, pokemon.show_img()[0])
         bot.send_message(message.chat.id, 'Светящаяся версия')
         bot.send_photo(message.chat.id, pokemon.show_img()[1])
-        bot.send_message(message.chat.id, f'Левел покемона: {pokemon.lvl()}')
         bot.send_message(message.chat.id, f'Количество вкусняшек: {snacks}. Чтобы получить вкусняшку, напишите "ВКУСНЯШКА" 10 раз. (с их помощью можно улучшать покемона)')
+        bot.send_message(message.chat.id, f'АТАКОВАТЬ КОГО-ТО⚔: /attack')
         bot.send_message(message.chat.id, f'Прокачать левел: /lvlup')
     else:
         bot.reply_to(message, "Ты уже создал себе покемона")
 
+@bot.message_handler(commands=['attack'])
+def attack_pok(message):
+    if message.reply_to_message:
+        if message.reply_to_message.from_user.username in Pokemon.pokemons.keys() and message.from_user.username in Pokemon.pokemons.keys():
+            enemy = Pokemon.pokemons[message.reply_to_message.from_user.username]
+            pok = Pokemon.pokemons[message.from_user.username]
+            res = pok.fight(enemy)
+            bot.send_message(message.chat.id, res)
+        else:
+            bot.send_message(message.chat.id, "Сражаться можно только с покемонами")
+    else:
+            bot.send_message(message.chat.id, "Чтобы атаковать, нужно ответить на сообщения того, кого хочешь атаковать")
 @bot.message_handler(commands=['lvlup'])
 def lvlup(message):
     global snacks, pokemon
     if message.from_user.username in Pokemon.pokemons.keys() and snacks > 0:
         pokemon.level += 1
+        pokemon.hp += random.randint(1,100)
+        pokemon.damage += random.randint(1,100)
         snacks -= 1
-        bot.send_message(message.chat.id, f'Левел покемона повышен!')
-        bot.send_message(message.chat.id, f'Левел покемона: {pokemon.lvl()}')
+        bot.send_message(message.chat.id, f'Левел покемона повышен! Произошло случайное улучшение характеристик!')
+        bot.send_message(message.chat.id, pokemon.info())
         bot.send_message(message.chat.id, f'Количество вкусняшек: {snacks}. Чтобы получить вкусняшку, напишите "ВКУСНЯШКА" 10 раз. (с их помощью можно улучшать покемона)')
         bot.send_message(message.chat.id, f'Прокачать левел: /lvlup')
+        bot.send_message(message.chat.id, f'АТАКОВАТЬ КОГО-ТО⚔: /attack')
     else:
         bot.send_message(message.chat.id, f'НЕДОСТАТОЧНО ВКУСНЯШЕК ИЛИ НЕТУ ПОКЕМОНА!')
 
