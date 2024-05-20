@@ -117,8 +117,9 @@ def go(message):
         bot.send_message(message.chat.id, 'Светящаяся версия')
         bot.send_photo(message.chat.id, pokemon.show_img()[1])
         bot.send_message(message.chat.id, f'Количество вкусняшек: {snacks}. Чтобы получить вкусняшку, напишите "ВКУСНЯШКА" 10 раз. (с их помощью можно улучшать покемона)')
-        bot.send_message(message.chat.id, f'АТАКОВАТЬ КОГО-ТО⚔: /attack')
-        bot.send_message(message.chat.id, f'Прокачать левел: /lvlup')
+        bot.send_message(message.chat.id, f'''Прокачать левел: /lvlup
+АТАКОВАТЬ КОГО-ТО⚔: /attack
+Чекнуть статы покемона: /pokemoninfo''')
     else:
         bot.reply_to(message, "Ты уже создал себе покемона")
 
@@ -134,6 +135,13 @@ def attack_pok(message):
             bot.send_message(message.chat.id, "Сражаться можно только с покемонами")
     else:
             bot.send_message(message.chat.id, "Чтобы атаковать, нужно ответить на сообщения того, кого хочешь атаковать")
+
+@bot.message_handler(commands=['pokemoninfo'])
+def pokemon_information(message):
+    if message.from_user.username in Pokemon.pokemons.keys():
+        pok = Pokemon.pokemons[message.from_user.username]
+        bot.send_message(message.chat.id, pok.info())
+
 @bot.message_handler(commands=['lvlup'])
 def lvlup(message):
     global snacks, pokemon
@@ -145,8 +153,9 @@ def lvlup(message):
         bot.send_message(message.chat.id, f'Левел покемона повышен! Произошло случайное улучшение характеристик!')
         bot.send_message(message.chat.id, pokemon.info())
         bot.send_message(message.chat.id, f'Количество вкусняшек: {snacks}. Чтобы получить вкусняшку, напишите "ВКУСНЯШКА" 10 раз. (с их помощью можно улучшать покемона)')
-        bot.send_message(message.chat.id, f'Прокачать левел: /lvlup')
-        bot.send_message(message.chat.id, f'АТАКОВАТЬ КОГО-ТО⚔: /attack')
+        bot.send_message(message.chat.id, f'''Прокачать левел: /lvlup
+АТАКОВАТЬ КОГО-ТО⚔: /attack
+Чекнуть статы покемона: /pokemoninfo''')
     else:
         bot.send_message(message.chat.id, f'НЕДОСТАТОЧНО ВКУСНЯШЕК ИЛИ НЕТУ ПОКЕМОНА!')
 
@@ -173,7 +182,9 @@ def echo_message(message):
         counter = 0
         bot.send_message(message.chat.id, f'Получена вкусняшка!')
         bot.send_message(message.chat.id, f'Количество вкусняшек: {snacks}. Чтобы получить вкусняшку, напишите "ВКУСНЯШКА" 10 раз. (с их помощью можно улучшать покемона)')
-        bot.send_message(message.chat.id, f'Прокачать левел: /lvlup')
+        bot.send_message(message.chat.id, f'''Прокачать левел: /lvlup
+АТАКОВАТЬ КОГО-ТО⚔: /attack
+Чекнуть статы покемона: /pokemoninfo''')
     
     print(message.text)
 
