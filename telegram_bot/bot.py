@@ -155,9 +155,9 @@ def lvlup(message):
         delta_time = timedelta(hours=feed_interval)  
         if (current_time - pokemon.feed_time) >= delta_time:
             pokemon.level += 1
+            snacks -= 1
             pokemon.hp += random.randint(1,100)
             pokemon.damage += random.randint(1,100)
-            snacks -= 1
             pokemon.feed_time = current_time
             bot.send_message(message.chat.id, f'Левел покемона повышен! Произошло случайное улучшение характеристик!')
             bot.send_message(message.chat.id, pokemon.info())
