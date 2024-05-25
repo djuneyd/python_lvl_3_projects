@@ -2,6 +2,10 @@ import config
 from class_dz import Dog
 import random
 from logic import Pokemon, Wizard, Fighter
+from datetime import datetime
+from datetime import timedelta
+# Создание объекта даты и времени
+now = datetime.now()
 print('Bot is active!')
 
 #!/usr/bin/python
@@ -145,17 +149,26 @@ def pokemon_information(message):
 @bot.message_handler(commands=['lvlup'])
 def lvlup(message):
     global snacks, pokemon
+    feed_interval = 20
     if message.from_user.username in Pokemon.pokemons.keys() and snacks > 0:
-        pokemon.level += 1
-        pokemon.hp += random.randint(1,100)
-        pokemon.damage += random.randint(1,100)
-        snacks -= 1
-        bot.send_message(message.chat.id, f'Левел покемона повышен! Произошло случайное улучшение характеристик!')
-        bot.send_message(message.chat.id, pokemon.info())
-        bot.send_message(message.chat.id, f'Количество вкусняшек: {snacks}. Чтобы получить вкусняшку, напишите "ВКУСНЯШКА" 10 раз. (с их помощью можно улучшать покемона)')
-        bot.send_message(message.chat.id, f'''Прокачать левел: /lvlup
+        current_time = datetime.now()  
+        delta_time = timedelta(hours=feed_interval)  
+        if (current_time - pokemon.feed_time) >= delta_time:
+            pokemon.level += 1
+            pokemon.hp += random.randint(1,100)
+            pokemon.damage += random.randint(1,100)
+            snacks -= 1
+            pokemon.feed_time = current_time
+            bot.send_message(message.chat.id, f'Левел покемона повышен! Произошло случайное улучшение характеристик!')
+            bot.send_message(message.chat.id, pokemon.info())
+            bot.send_message(message.chat.id, f'''Количество вкусняшек: {snacks}.
+Чтобы получить вкусняшку, напишите "ВКУСНЯШКА" 10 раз. (с их помощью можно улучшать покемона)''')
+            bot.send_message(message.chat.id, f"Следующее время кормления покемона: {pokemon.feed_time+delta_time}")
+            bot.send_message(message.chat.id, f'''Прокачать левел: /lvlup
 АТАКОВАТЬ КОГО-ТО⚔: /attack
 Чекнуть статы покемона: /pokemoninfo''')
+        else:
+            bot.send_message(message.chat.id, f"Следующее время кормления покемона: {pokemon.feed_time+delta_time}")
     else:
         bot.send_message(message.chat.id, f'НЕДОСТАТОЧНО ВКУСНЯШЕК ИЛИ НЕТУ ПОКЕМОНА!')
 

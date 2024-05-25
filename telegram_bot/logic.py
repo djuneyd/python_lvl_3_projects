@@ -1,5 +1,9 @@
 from random import randint
 import requests
+from datetime import datetime
+
+# Создание объекта даты и времени
+now = datetime.now()
 
 class Pokemon:
     pokemons = {}
@@ -15,6 +19,7 @@ class Pokemon:
         self.hp = randint(1,1000)
         self.damage = randint(200,500)
         self.rase = 'Common'
+        self.feed_time = datetime.now()
 
         Pokemon.pokemons[pokemon_trainer] = self
 
@@ -67,6 +72,13 @@ class Pokemon:
                 chanse = randint(1,5)
                 if chanse == 1:
                     return "Покемон-волшебник применил щит в сражении, урон не прошёл!"
+                else:
+                    if enemy.hp > self.damage:
+                        enemy.hp -= self.damage
+                        return f"Сражение @{self.pokemon_trainer} с @{enemy.pokemon_trainer}"
+                    else:
+                        enemy.hp = 0
+                        return f"Победа @{self.pokemon_trainer} над @{enemy.pokemon_trainer}!"
                 
             if isinstance(self, Fighter):
                 ulta = randint(200,500)
