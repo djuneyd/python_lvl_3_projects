@@ -34,7 +34,7 @@ def callback_query(call):
         if user_responses[call.message.chat.id]>=len(quiz_questions):
             bot.send_message(call.message.chat.id, f"The end, your points: {points[call.from_user.id]}")
         else:
-            photo = open(f'M2L3\sk{i}.jpg', 'rb')
+            photo = open(f'quiz\sk{i}.jpg', 'rb')
             bot.send_photo(call.message.chat.id, photo)
             send_question(call.message.chat.id)
 
@@ -48,7 +48,7 @@ def start(message):
         points[message.from_user.id] = 0
         i = 1
         us = message.from_user.id
-        photo = open(f'M2L3\sk{i}.jpg', 'rb')
+        photo = open(f'quiz\sk{i}.jpg', 'rb')
         bot.send_photo(message.chat.id, photo)
         send_question(message.chat.id)
 
