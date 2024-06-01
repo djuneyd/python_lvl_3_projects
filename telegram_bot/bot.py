@@ -4,6 +4,8 @@ import random
 from logic import Pokemon, Wizard, Fighter
 from datetime import datetime
 from datetime import timedelta
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 # Создание объекта даты и времени
 now = datetime.now()
 print('Bot is active!')
@@ -35,9 +37,72 @@ def send_welcome(message):
 /info - информация о боте😊
 /help - помощь с командами❤
 /go - ИГРА В POKEMON GO!🤩\
+/Normal - Воспользоваться встроенной клавиатурой!
                  
 Я также пересылаю вам картинки которые вы мне отправляете😁
 """)
+
+keys = ["1","2","3","4","5","6","7","8","9","0","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m"]
+symbols = ["1","2","3","4","5","6","7","8","9","0","!","@","#","$","%","^","&","*","(",")","\'","\"","/","\\",",",".",";",":"]
+
+def keyboard(key_type="Normal"):
+    markup = ReplyKeyboardMarkup(row_width=10)
+    if key_type == "Normal":
+        row = [KeyboardButton(x) for x in keys[:10]]
+        markup.add(*row)
+        row = [KeyboardButton(x) for x in keys[10:20]]
+        markup.add(*row)
+        row = [KeyboardButton(x) for x in keys[20:29]]
+        markup.add(*row)
+        row = [KeyboardButton(x) for x in keys[29:]]
+        markup.add(*row)
+        markup.add(KeyboardButton("Caps Lock"),KeyboardButton("Symbols"),KeyboardButton("🔙Delete"),KeyboardButton("✅Done"))
+    elif key_type == "Symbols":
+        row = [KeyboardButton(x) for x in symbols[:10]]
+        markup.add(*row)
+        row = [KeyboardButton(x) for x in symbols[10:20]]
+        markup.add(*row)
+        row = [KeyboardButton(x) for x in symbols[20:]]
+        markup.add(*row)
+        markup.add(KeyboardButton("Caps Lock"),KeyboardButton("Normal"),KeyboardButton("🔙Delete"),KeyboardButton("✅Done"))
+    else:
+        row = [KeyboardButton(x.upper()) for x in keys[:10]]
+        markup.add(*row)
+        row = [KeyboardButton(x.upper()) for x in keys[10:20]]
+        markup.add(*row)
+        row = [KeyboardButton(x.upper()) for x in keys[20:29]]
+        markup.add(*row)
+        row = [KeyboardButton(x.upper()) for x in keys[29:]]
+        markup.add(*row)
+        markup.add(KeyboardButton("Normal"),KeyboardButton("Symbols"),KeyboardButton("🔙Delete"),KeyboardButton("✅Done"))
+    return markup
+
+@bot.message_handler(commands=["start"])
+def start_message(message):
+    bot.send_message(message.chat.id,"You can use the keyboard",reply_markup=keyboard())
+
+
+
+
+
+def gen_markup():
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 2
+    markup.add(InlineKeyboardButton("Yes", callback_data="cb_yes"),
+                               InlineKeyboardButton("No", callback_data="cb_no"))
+    return markup
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    if call.data == "cb_yes":
+        bot.answer_callback_query(call.id, "Ты подтвердил своё причастие к 43 федеральным приступлениям :)")
+    elif call.data == "cb_no":
+        bot.answer_callback_query(call.id, "Answer is No")
+
+@bot.message_handler(commands=['random_question'])
+def message_handler(message):
+    bot.send_message(message.chat.id, "Yes/no?", reply_markup=gen_markup())
 
 #get info
 @bot.message_handler(commands=['info'])
@@ -171,6 +236,22 @@ def lvlup(message):
             bot.send_message(message.chat.id, f"Следующее время кормления покемона: {pokemon.feed_time+delta_time}")
     else:
         bot.send_message(message.chat.id, f'НЕДОСТАТОЧНО ВКУСНЯШЕК ИЛИ НЕТУ ПОКЕМОНА!')
+        
+@bot.message_handler(func=lambda message:True)
+def all_messages(message):
+    if message.text == "✅Done":
+        markup = telebot.types.ReplyKeyboardRemove()
+        bot.send_message(message.from_user.id,"Done with Keyboard",reply_markup=markup)
+    elif message.text == "Symbols":
+        bot.send_message(message.from_user.id,"Special characters",reply_markup=keyboard("Symbols"))
+    elif message.text == "Normal":
+        bot.send_message(message.from_user.id,"Normal Keyboard",reply_markup=keyboard("Normal"))
+    elif message.text == "Caps Lock":
+        bot.send_message(message.from_user.id,"Caps Lock",reply_markup=keyboard("Caps"))
+    elif message.text == "🔙Delete":
+        bot.delete_message(message.from_user.id,message.message_id)
+    else:
+        bot.send_message(message.chat.id,message.text)
 
 # Handle all other messages with content_type 'text' (content_types defaults to ['text']) and ban function for links
 @bot.message_handler(func=lambda message: True)
