@@ -42,7 +42,11 @@ def callback_query(call):
 def start(message):
     global i, us
     if message.chat.id in user_responses.keys():
-        del user_responses[message.chat.id]
+        if i==4:
+            del user_responses[message.chat.id]
+        else:
+            bot.send_message(message.chat.id, "СНАЧАЛА ЗАВЕРШИ ПРЕДЫДУЩИЙ КВИЗ!!!")
+            bot.delete_message(message.chat.id, message.message_id)
     if message.chat.id not in user_responses.keys():
         user_responses[message.chat.id] = 0
         points[message.from_user.id] = 0
