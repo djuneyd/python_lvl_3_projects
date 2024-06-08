@@ -1,5 +1,6 @@
 import telebot
 from config import token
+from telebot.apihelper import ApiException
 # Задание 7 - испортируй команду defaultdict
 from collections import defaultdict
 from logic import quiz_questions
@@ -56,6 +57,4 @@ def start(message):
         photo = open(f'quiz\sk{num_of_questions[message.from_user.id]}.jpg', 'rb')
         bot.send_photo(message.chat.id, photo)
         send_question(message.chat.id, message.from_user.id, message.from_user.username)
-
-
 bot.infinity_polling()
