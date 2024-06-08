@@ -4,6 +4,8 @@ import requests
 from collections import defaultdict
 
 # Задание №5
+questions = {'как тебя зовут' : "Я супер-крутой-бот и мое предназначение помогать тебе!",
+"сколько тебе лет" : "Это слишком философский вопрос"}
 
 class TextAnalysis():   
     
@@ -18,8 +20,10 @@ class TextAnalysis():
 
         # Задание №6
         self.response = self.get_answer()
-
-    
+        if self.text.lower() in questions.keys():
+            self.response = questions[self.text]
+        else:
+            self.response = self.get_answer() 
     def get_answer(self):
         res = self.__translate(self.__deep_pavlov_answer(), "en", "ru")
         return res

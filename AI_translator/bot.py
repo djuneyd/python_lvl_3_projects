@@ -20,8 +20,10 @@ def callback_query(call):
     if "text" in call.data:
         obj = TextAnalysis.memory[call.from_user.username][-1]
         if call.data == "text_ans":
+            bot.send_chat_action(call.message.chat.id, 'typing')
             bot.send_message(call.message.chat.id, obj.response)
         elif call.data == "text_translate":
+            bot.send_chat_action(call.message.chat.id, 'typing')
             bot.send_message(call.message.chat.id,  obj.translation)
 
 
