@@ -1,6 +1,5 @@
 import telebot
 from config import token
-from telebot.apihelper import ApiException
 # Задание 7 - испортируй команду defaultdict
 from collections import defaultdict
 from logic import quiz_questions
@@ -41,20 +40,31 @@ def callback_query(call):
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    global i, us, usname
     if message.from_user.id in user_responses.keys():
         if num_of_questions[message.from_user.id]==4:
             del user_responses[message.from_user.id]
             del num_of_questions[message.from_user.id]
         else:
-            bot.send_message(message.chat.id, f"СНАЧАЛА ЗАВЕРШИ ПРЕДЫДУЩИЙ КВИЗ!!! @{message.from_user.username} id: {message.from_user.id}")
+            bot.send_message(message.chat.id, f'''СНАЧАЛА ЗАВЕРШИ ПРЕДЫДУЩИЙ КВИЗ!!! @{message.from_user.username} id: {message.from_user.id}
+Если что то пошло не так сотри свои данные командой /clear потом снова нажми /start''')
             bot.delete_message(message.chat.id, message.message_id)
     if message.from_user.id not in user_responses.keys():
-        usname = message.from_user.username
         user_responses[message.from_user.id] = 0
         points[message.from_user.id] = 0
         num_of_questions[message.from_user.id] = 1
         photo = open(f'quiz\sk{num_of_questions[message.from_user.id]}.jpg', 'rb')
         bot.send_photo(message.chat.id, photo)
         send_question(message.chat.id, message.from_user.id, message.from_user.username)
+
+@bot.message_handler(commands=['clear'])
+def clear(message):
+    if message.from_user.id in user_responses.keys():
+        bot.delete_message(message.chat.id, message.message_id)
+        bot.send_message(message.chat.id, f'Данные @{message.from_user.username} id: {message.from_user.id} успешно удалены!!!')
+        del user_responses[message.from_user.id]
+        del num_of_questions[message.from_user.id]
+    else:
+        bot.delete_message(message.chat.id, message.message_id)
+        bot.send_message(message.chat.id, '''У тебя ещё нету данных 😋
+/start чтобы начать''')
 bot.infinity_polling()
