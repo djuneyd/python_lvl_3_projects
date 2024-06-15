@@ -21,7 +21,7 @@ class TextAnalysis():
         # Задание №6
         self.response = self.get_answer()
         if self.text.lower() in questions.keys():
-            self.response = questions[self.text]
+            self.response = questions[self.text.lower()]
         else:
             self.response = self.get_answer() 
     def get_answer(self):
