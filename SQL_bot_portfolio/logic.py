@@ -35,8 +35,8 @@ class DB_Manager:
                             status_name TEXT
                         )''')
             
-            alter_query = f"ALTER TABLE projects ADD COLUMN image BLOB"
-            conn.execute(alter_query)
+            # alter_query = f"ALTER TABLE projects ADD COLUMN image BLOB"
+            # conn.execute(alter_query)
             conn.commit()
 
     def __executemany(self, sql, data):
