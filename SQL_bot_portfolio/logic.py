@@ -146,7 +146,6 @@ WHERE skill_id = ? AND project_id = ? """
     def add_skill(self, name):
         sql = 'INSERT OR IGNORE INTO skills VALUES(?, ?)'
         ind = self.__select_data(sql='SELECT skill_id FROM skills')
-        print(ind)
         ind = ind[-1][0] + 1
         self.__executemany(sql, [(ind, name)])
 
