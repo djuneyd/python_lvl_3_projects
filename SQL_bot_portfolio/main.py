@@ -97,8 +97,12 @@ def callback_project(message, data, statuses):
         return
     status_id = manager.get_status_id(status)
     data.append(status_id)
+    bot.register_next_step_handler(message, description_project, data=data)
+    bot.send_message(message.chat.id, "Введите описание к проекту!")
+
+def description_project(message, data):
+    data.append(message.text)
     manager.insert_project([tuple(data)])
-    bot.send_message(message.chat.id, "Проект сохранен")
 
 
 @bot.message_handler(commands=['skills'])
