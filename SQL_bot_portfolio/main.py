@@ -219,7 +219,6 @@ def delete_project(message, projects):
     project_id = manager.get_project_id(project, user_id)
     manager.delete_project(user_id, project_id)
     bot.send_message(message.chat.id, f'Проект {project} удален!')
-    imc-=1
 
 # Этот хэндлер обновляет проекты
 @bot.message_handler(commands=['update_projects'])
