@@ -139,10 +139,6 @@ WHERE skill_id = ? AND project_id = ? """
         self.__executemany(sql, [(skill_id, project_id)])
 
     #dz
-    def del_status(self, status_id):
-        sql = """DELETE FROM status WHERE status_id = ?"""
-        self.__executemany(sql, (status_id))
-
     def up_skill(self, skill_id, param, newvalue):
         sql = f"""UPDATE skills SET {param} = ? WHERE skill_id = ?"""
         self.__executemany(sql, [(newvalue, skill_id)])
@@ -150,19 +146,37 @@ WHERE skill_id = ? AND project_id = ? """
     def add_skill(self, name):
         sql = 'INSERT OR IGNORE INTO skills VALUES(?, ?)'
         ind = self.__select_data(sql='SELECT skill_id FROM skills')
+        print(ind)
         ind = ind[-1][0] + 1
         self.__executemany(sql, [(ind, name)])
+
+    def del_skill(self, skill_id):
+        sql = """DELETE FROM skills WHERE skill_id = ?"""
+        self.__executemany(sql, (skill_id))
+
+    def del_status(self, status_id):
+        sql = """DELETE FROM status WHERE status_id = ?"""
+        self.__executemany(sql, (status_id))
 
     def up_status(self, status_id, param, newvalue):
         sql = f'UPDATE status SET {param} = ? WHERE status_id = ?'
         self.__executemany(sql, [(newvalue, status_id)])
 
+    def add_status(self, name):
+        sql = 'INSERT OR IGNORE INTO status VALUES(?, ?)'
+        ind = self.__select_data(sql='SELECT status_id FROM status')
+        ind = ind[-1][0] + 1
+        self.__executemany(sql, [(ind, name)])
+
 
 if __name__ == '__main__':
     manager = DB_Manager(f'SQL_bot_portfolio/{DATABASE}')
     manager.create_tables()
+    manager.default_insert()
     #протестируй методы здесь
-    #manager.default_insert()
+    # manager.add_skill('raet')
+    # manager.add_status('esrg')
+    # manager.del_skill('1')
     #manager.insert_project([(1, 'walking aboba', 'https://www.youtube.com/watch?v=xvFZjo5PgG0', 3)])
 
     #manager.del_status('5')
