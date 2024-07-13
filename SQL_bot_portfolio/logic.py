@@ -1,5 +1,6 @@
+import os
 import sqlite3
-from config import DATABASE
+from config import DATABASE, imc
 
 skills = [ (_,) for _ in (['Python', 'SQL', 'API', 'Telegram'])]
 statuses = [ (_,) for _ in (['На этапе проектирования', 'В процессе разработки', 'Разработан. Готов к использованию.', 'Обновлен', 'Завершен. Не поддерживается'])]
@@ -35,8 +36,8 @@ class DB_Manager:
                             status_name TEXT
                         )''')
             
-            # alter_query = f"ALTER TABLE projects ADD COLUMN image BLOB"
-            # conn.execute(alter_query)
+            alter_query = f"ALTER TABLE projects ADD COLUMN image BLOB"
+            conn.execute(alter_query)
             conn.commit()
 
     def __executemany(self, sql, data):
@@ -63,8 +64,8 @@ class DB_Manager:
 
     def insert_project(self, data):
         sql = """INSERT INTO projects 
-        (user_id, project_name, url, status_id) 
-        values(?, ?, ?, ?)"""
+        (user_id, project_name, url, status_id, description, image) 
+        values(?, ?, ?, ?, ?, ?)"""
         self.__executemany(sql, data)
 
 
@@ -123,12 +124,14 @@ WHERE project_name = ? AND user_id = ?"""
 
 
     def delete_project(self, user_id, project_id):
+        global imc
         sql = """DELETE FROM projects 
 WHERE user_id = ? AND project_id = ? """
         self.__executemany(sql, [(user_id, project_id)])
         sql = """DELETE FROM project_skills 
 WHERE project_id = ? """
         self.__executemany(sql, (str(project_id)))
+        os.remove(f'SQL_bot_portfolio\images\image{imc}.jpg')
     
     def delete_skill(self, project_id, skill_id):
         sql = """DELETE FROM skills 

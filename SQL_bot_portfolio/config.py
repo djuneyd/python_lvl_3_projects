@@ -1,2 +1,3 @@
 TOKEN = '6747645718:AAGCQOrJwLmzfdu5CjD5YrFJAmf6PZWldAI'
 DATABASE = 'Projects.db'
+imc = 1

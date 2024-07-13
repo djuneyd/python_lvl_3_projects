@@ -3,6 +3,8 @@ from config import *
 from telebot import TeleBot
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from telebot import types
+import shutil, os
+from config import imc
 
 bot = TeleBot(TOKEN)
 hideBoard = types.ReplyKeyboardRemove() 
@@ -52,7 +54,9 @@ def start_command(message):
 Помогу тебе сохранить твои проекты и информацию о них!) 
 """)
     info(message)
-    
+
+
+# Тута просто получаем инфу о всех командах бота  
 @bot.message_handler(commands=['info'])
 def info(message):
     bot.send_message(message.chat.id,
@@ -67,7 +71,7 @@ def info(message):
 
 Также ты можешь ввести имя проекта и узнать информацию о нем!""")
     
-
+# Ну тут просто добавляем новый проект, все последующие функции также связаны с данным хэндлэром
 @bot.message_handler(commands=['new_project'])
 def addtask_command(message):
     bot.send_message(message.chat.id, "Введите название проекта:")
@@ -102,9 +106,33 @@ def callback_project(message, data, statuses):
 
 def description_project(message, data):
     data.append(message.text)
-    manager.insert_project([tuple(data)])
+    bot.send_message(message.chat.id, "И напоследок, отправьте картинку вашего проекта!!!")
+    bot.register_next_step_handler(message, photo, data=data)
 
+# Это сохранение отправленной фотографии проекта как в локальную папку так и в базу данных
+@bot.message_handler(content_types=['photo'])
+def photo(message, data):   
+     global imc
+     if isinstance(message.text, str):
+         bot.send_message(message.chat.id, "Отправьте картинку вашего проекта!!!")
+         bot.register_next_step_handler(message, photo, data=data)
+     else:
+        fileID = message.photo[-1].file_id   
+        file_info = bot.get_file(fileID)
+        downloaded_file = bot.download_file(file_info.file_path)
+        with open("image.jpg", 'wb') as new_file:
+            new_file.write(downloaded_file)
+        
+        os.rename('image.jpg', f'image{imc}.jpg')
+        shutil.move(f'image{imc}.jpg', 'SQL_bot_portfolio\images')
+        with open(f"SQL_bot_portfolio\images\image{imc}.jpg", 'rb') as new_file:
+            file = new_file.read()
+        data.append(file)
+        manager.insert_project([tuple(data)])
+        bot.send_message(message.chat.id, "ПРОЕКТ УСПЕШНО СОХРАНЁН!!!🥳🥳🥳")
+        imc+=1
 
+# Этот хэнлер добавляет скиллы которые использовались в определённых проектах
 @bot.message_handler(commands=['skills'])
 def skill_handler(message):
     user_id = message.from_user.id
@@ -146,6 +174,7 @@ def set_skill(message, project_name, skills):
     bot.send_message(message.chat.id, f'Навык {skill} добавлен проекту {project_name}')
 
 
+# Этот хэндлер отображает все проекты
 @bot.message_handler(commands=['projects'])
 def get_projects(message):
     user_id = message.from_user.id
@@ -162,6 +191,7 @@ def callback_query(call):
     info_project(call.message, call.from_user.id, project_name)
 
 
+# Ну тут по названию и так понятно что данный хэндлер удаляет проект
 @bot.message_handler(commands=['delete'])
 def delete_handler(message):
     user_id = message.from_user.id
@@ -175,6 +205,7 @@ def delete_handler(message):
         no_projects(message)
 
 def delete_project(message, projects):
+    global imc
     project = message.text
     user_id = message.from_user.id
 
@@ -188,8 +219,9 @@ def delete_project(message, projects):
     project_id = manager.get_project_id(project, user_id)
     manager.delete_project(user_id, project_id)
     bot.send_message(message.chat.id, f'Проект {project} удален!')
+    imc-=1
 
-
+# Этот хэндлер обновляет проекты
 @bot.message_handler(commands=['update_projects'])
 def update_project(message):
     user_id = message.from_user.id
