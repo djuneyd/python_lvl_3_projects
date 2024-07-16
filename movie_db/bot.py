@@ -27,11 +27,12 @@ def callback_query(call):
 
 def send_message():
     prize_id, img = manager.get_random_prize()[:2]
-    manager.mark_prize_used(prize_id)
-    hide_img(img)
-    for user in manager.get_users():
-        with open(f'movie_db/hidden_img/{img}', 'rb') as photo:
-            bot.send_photo(user, photo, reply_markup=gen_markup(id = prize_id))
+    if img != 'no more pics':
+        manager.mark_prize_used(prize_id)
+        hide_img(img)
+        for user in manager.get_users():
+            with open(f'movie_db/hidden_img/{img}', 'rb') as photo:
+                bot.send_photo(user, photo, reply_markup=gen_markup(id = prize_id))
         
 
 def shedule_thread():
@@ -52,7 +53,7 @@ def handle_start(message):
 Каждый час тебе будут приходить новые картинки и у тебя будет шанс их получить!
 Для этого нужно быстрее всех нажать на кнопку 'Получить!'
 
-Только три первых пользователя получат картинку!)""")
+Только 11 первых пользователя получат картинку!)""")
         
 
 
@@ -68,4 +69,3 @@ if __name__ == '__main__':
 
     polling_thread.start()
     polling_shedule.start()
-  

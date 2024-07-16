@@ -90,7 +90,11 @@ class DatabaseManager:
         with conn:
             cur = conn.cursor()
             cur.execute(f'''SELECT * FROM prizes WHERE used = 0 ORDER BY RANDOM()''')
-            return cur.fetchall()[0]
+            result = cur.fetchall()
+            if len(result) > 0:
+                return result[0]
+            else:
+                 return [0, 'no more pics']
     
   
 def hide_img(img_name):
