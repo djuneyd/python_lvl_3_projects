@@ -20,9 +20,16 @@ def callback_query(call):
     prize_id = call.data
     user_id = call.message.chat.id
 
-    img = manager.get_prize_img(prize_id)
-    with open(f'movie_db/img/{img}', 'rb') as photo:
-        bot.send_photo(user_id, photo)
+    if manager.get_winners_count(prize_id) < 3:
+        res = manager.add_winner(user_id, prize_id)
+        if res:
+            img = manager.get_prize_img(prize_id)
+            with open(f'movie_db/img/{img}', 'rb') as photo:
+                bot.send_photo(user_id, photo)
+        else:
+            bot.send_message(user_id, 'Ты уже получил картинку!')
+    else:
+        bot.send_message(user_id, "К сожалению, ты не успел получить картинку! Попробуй в следующий раз!)")
 
 
 def send_message():
@@ -53,7 +60,15 @@ def handle_start(message):
 Каждый час тебе будут приходить новые картинки и у тебя будет шанс их получить!
 Для этого нужно быстрее всех нажать на кнопку 'Получить!'
 
-Только 11 первых пользователя получат картинку!)""")
+Только три первых пользователя получат картинку!)""")
+        
+@bot.message_handler(commands=['rating'])
+def handle_rating(message):
+    res = manager.get_rating() 
+    res = [f'| @{x[0]:<11} | {x[1]:<11}|\n{"_"*26}' for x in res]
+    res = '\n'.join(res)
+    res = f'|USER_NAME    |COUNT_PRIZE|\n{"_"*26}\n' + res
+    bot.send_message(message.chat.id, res)
         
 
 
