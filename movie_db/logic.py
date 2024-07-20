@@ -142,13 +142,7 @@ def create_collage(image_paths):
     images = []
     for path in image_paths:
         image = cv2.imread(path)
-        if image is None:
-            print(f"Error loading image at path: {path}")
-            continue
         images.append(image)
-
-    if not images:
-        raise ValueError("No images were loaded. Please check the paths.")
 
     num_images = len(images)
     num_cols = floor(sqrt(num_images))  # Поиск количества картинок по горизонтали
