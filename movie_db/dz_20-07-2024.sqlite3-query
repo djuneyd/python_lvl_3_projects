@@ -1,0 +1,30 @@
+-- database: ./data_bases/movie.db
+
+-- Чтобы выполнить весь файл, нажмите кнопку ▷ в правом верхнем углу окна.
+
+SELECT directors.director_name, MAX(movies.release_date) AS last_release_date
+FROM directors
+JOIN movies ON directors.id = movies.director_id
+GROUP BY directors.director_name;
+
+SELECT directors.director_name, SUM(movies.budget) AS sum_of_budget
+FROM directors
+JOIN movies ON directors.id = movies.director_id
+GROUP BY directors.director_name;
+
+SELECT directors.director_name, COUNT(movies.budget) AS amount_of_movies
+FROM directors
+JOIN movies ON directors.id = movies.director_id
+GROUP BY directors.director_name;
+
+SELECT movies.title, COUNT(movies_genres.genre_id) AS genres
+FROM movies
+JOIN movies_genres ON movies.id = movies_genres.movie_id
+GROUP BY movies.title;
+
+SELECT directors.director_name, COUNT(DISTINCT movies_genres.genre_id) AS genre_count
+FROM directors
+JOIN movies ON directors.id = movies.director_id
+JOIN movies_genres ON movies.id = movies_genres.movie_id
+GROUP BY directors.director_name;
+
