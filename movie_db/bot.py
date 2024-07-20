@@ -6,6 +6,7 @@ import threading
 import time
 from config import *
 import os
+import shutil
 
 bot = TeleBot(API_TOKEN)
 
@@ -84,6 +85,37 @@ def handler_collage(message):
                 bot.send_photo(user_id, photo)
     os.remove('movie_db/collage.jpg')
 
+@bot.message_handler(commands=['add_image'])
+def addition(message):
+    id = message.from_user.id
+    user_id = message.chat.id
+    if str(id) == '7450135061':
+        bot.send_message(user_id, 'Отправь новую картинку повелитель!!!')
+        bot.register_next_step_handler(message, photo)
+    else:
+        bot.send_message(user_id, 'Думаешь ты один такой умный?)')
+
+def photo(message):
+     if isinstance(message.text, str):
+         bot.send_message(message.chat.id, "Отправьте картинку!!!")
+         bot.register_next_step_handler(message, photo)
+     else:
+        fileID = message.photo[-1].file_id   
+        file_info = bot.get_file(fileID)
+        downloaded_file = bot.download_file(file_info.file_path)
+        with open("image.jpg", 'wb') as new_file:
+            new_file.write(downloaded_file)
+        
+        conn = sqlite3.connect(DATABASE)
+        with conn:
+            cur = conn.cursor()
+            cur.execute('SELECT prize_id FROM prizes ORDER BY prize_id DESC LIMIT 1')
+            result = cur.fetchall()
+        os.rename('image.jpg', f'{result[0][0]+1}.jpeg')
+        shutil.move(f'{result[0][0]+1}.jpeg', f'movie_db/img/{result[0][0]+1}.jpeg')
+
+        imga = f'{result[0][0]+1}.jpeg'
+        manager.add_prize([(imga,)])
 
 def polling_thread():
     bot.polling(none_stop=True)
