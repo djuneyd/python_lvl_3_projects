@@ -5,6 +5,7 @@ import schedule
 import threading
 import time
 from config import *
+import os
 
 bot = TeleBot(API_TOKEN)
 
@@ -69,7 +70,19 @@ def handle_rating(message):
     res = '\n'.join(res)
     res = f'|USER_NAME    |COUNT_PRIZE|\n{"_"*26}\n' + res
     bot.send_message(message.chat.id, res)
-        
+
+@bot.message_handler(commands=['get_my_score'])
+def handler_collage(message):
+    user_id = message.chat.id
+    info = manager.get_winners_img(user_id)
+    prizes = [x[0] for x in info]
+    image_paths = os.listdir('movie_db/hidden_img')
+    image_paths = [f'movie_db/img/{x}' if x in prizes else f'movie_db/hidden_img/{x}' for x in image_paths]
+    collage = create_collage(image_paths)
+    cv2.imwrite('movie_db/collage.jpg', collage)
+    with open(f'movie_db/collage.jpg', 'rb') as photo:
+                bot.send_photo(user_id, photo)
+    os.remove('movie_db/collage.jpg')
 
 
 def polling_thread():
