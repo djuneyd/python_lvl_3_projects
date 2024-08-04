@@ -18,7 +18,13 @@ def csv_to_sqlite(csv_file, db_file, table_name, columns):
     with open(csv_file, 'r', newline='', encoding='utf-8') as csvfile:
         csvreader = csv.reader(csvfile)
         next(csvreader)  # Skip header
-        data = [row for row in csvreader]
+        data = []
+        i = 1
+        for row in csvreader:
+            row.append(i)
+            row[3] = row[3].capitalize()
+            data.append(row)
+            i+=1
 
     insert_data(cursor, table_name, columns, data)
 
@@ -27,8 +33,8 @@ def csv_to_sqlite(csv_file, db_file, table_name, columns):
 
 # Пример использования:
 csv_file = 'individual_project/data/Popular_Baby_Names.csv'
-db_file = 'individual_project/data/Popular_Baby_Names.db'
+db_file = 'individual_project/Popular_Baby_Names.db'
 table_name = 'Names_data'
-columns = ['Year_of_Birth', 'Gender', 'Ethnicity', "Childs_First_Name", 'Count', 'Rank']  # Замените на реальные названия столбцов из вашего CSV
+columns = ['Year_of_Birth', 'Gender', 'Ethnicity', "Childs_First_Name", 'Count', 'Rank', 'id']  # Замените на реальные названия столбцов из вашего CSV
 
 csv_to_sqlite(csv_file, db_file, table_name, columns)
