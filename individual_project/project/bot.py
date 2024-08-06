@@ -36,6 +36,7 @@ def generate_markup_gender(chat_id):
     markup.add(InlineKeyboardButton('FEMALE', callback_data='gender FEMALE'))
     bot.send_message(chat_id,f"Выберите пол ребёночка.🥰", reply_markup=markup)
 
+# same names question
 def same_names_question(chat_id):
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton('10', callback_data='amount 10'))
@@ -44,19 +45,27 @@ def same_names_question(chat_id):
     markup.add(InlineKeyboardButton('10000', callback_data='amount 10000'))
     bot.send_message(chat_id,f"Выберите максимальное количество тёзок вашего ребёночка.🥰", reply_markup=markup)
 
+# number of names
+def number_of_names(chat_id):
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton('10', callback_data='number 10'))
+    markup.add(InlineKeyboardButton('50', callback_data='number 50'))
+    markup.add(InlineKeyboardButton('100', callback_data='number 100'))
+    bot.send_message(chat_id,f"Выберите количество имён которые хотите посмотреть.🥰", reply_markup=markup)
+
 # names output
-def names_amount(ethnicity, gender, amount, chat_id):
+def names_amount(ethnicity, gender, amount, number, chat_id):
     sql = f'''SELECT Names_data.Childs_First_Name, SUM(Names_data.Count) AS overall
             FROM Names_data WHERE Ethnicity="{ethnicity}" AND Gender="{gender}"
-            GROUP BY Names_data.Childs_First_Name HAVING overall <= {amount} ORDER BY overall DESC LIMIT 10'''
+            GROUP BY Names_data.Childs_First_Name HAVING overall <= {amount} ORDER BY overall DESC LIMIT {number}'''
     data = []
 
     result = manager.select_data(sql, data)
 
     response = ''
     responselist = ['Имя:  |Названо детей за последние 10 лет:\n']
-    for i in result:
-        responselist.append(f'{i[0]} : {i[1]}\n')
+    for number,i in enumerate(result):
+        responselist.append(f'{number+1}) {i[0]} : {i[1]}\n')
     amount = len(responselist) - 1
 
     if amount > 0:
@@ -77,25 +86,33 @@ def callback_query(call):
     global data
     # удаление инлайн клавы
     bot.delete_message(call.message.chat.id, call.message.message_id)
-    if call.data.split()[0] == 'ethnicity':
+    # ключевое слово
+    key_word = call.data.split()[0]
+    # обработка
+    if key_word == 'ethnicity':
         # коррекция параметра
-        ethnicity = call.data.replace(f'{call.data.split()[0]}', '')
-        ethnicity = ethnicity.strip()
+        ethnicity = call.data.replace(f'{key_word}', '').strip()
         data.append(ethnicity)
         # некст гуэшн
         generate_markup_gender(call.message.chat.id)
-    elif call.data.split()[0] == 'gender':
+    elif key_word == 'gender':
         # коррекция параметра
         gender = call.data.split()[1]
         data.append(gender)
         # некст гуэшн
         same_names_question(call.message.chat.id)
-    elif call.data.split()[0] == 'amount':
+    elif key_word == 'amount':
+        # коррекция параметра
+        amount = int(call.data.split()[1])
+        data.append(amount)
+        # некст гуэшн
+        number_of_names(call.message.chat.id)
+    elif key_word == 'number':
         # коррекция параметра
         amount = int(call.data.split()[1])
         data.append(amount)
         # ансвер 
-        names_amount(data[0], data[1], data[2], call.message.chat.id)
+        names_amount(data[0], data[1], data[2], data[3], call.message.chat.id)
         data = []
         
     
