@@ -14,8 +14,11 @@ def start_command(message):
 ---------------------------------------------------------------------------
 Я анализирую свыше 70.000 различных записей которые ведутся с 2011-2021 года.
 На протяжении этих десяти лет велось наблюдение над каждым именем вплоть до того, сколько детей определённой этнической принадлежности в определённый год определённого пола были названы определённым именем!
+У меня хранятся данные 2.338.005-и детишек❗❗❗
 ---------------------------------------------------------------------------
-/name - предложить имя
+/name - предложить имя🧐
+/most_popular_names - самые популярные имена🚀
+/the_rarest_names - самые редкие имена🤯
 """)
 
 # ethnicity question
@@ -30,10 +33,14 @@ def generate_markup_ethnicity(chat_id):
     bot.send_message(chat_id,"Выберите этническую принадлежность вашего ребёночка, или же максимально приблежённую.🥰", reply_markup=markup)
 
 # gender question
-def generate_markup_gender(chat_id):
+def generate_markup_gender(chat_id, check, check_popularity):
+    if check == 1:
+        data = 'gender_name'
+    elif check == 2:
+        data = f'gender_popular_{check_popularity}'
     markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton('MALE', callback_data='gender MALE'))
-    markup.add(InlineKeyboardButton('FEMALE', callback_data='gender FEMALE'))
+    markup.add(InlineKeyboardButton('MALE', callback_data=f'{data} MALE'))
+    markup.add(InlineKeyboardButton('FEMALE', callback_data=f'{data} FEMALE'))
     bot.send_message(chat_id,f"Выберите пол ребёночка.🥰", reply_markup=markup)
 
 # same names question
@@ -43,14 +50,19 @@ def same_names_question(chat_id):
     markup.add(InlineKeyboardButton('100', callback_data='amount 100'))
     markup.add(InlineKeyboardButton('1000', callback_data='amount 1000'))
     markup.add(InlineKeyboardButton('10000', callback_data='amount 10000'))
+    markup.add(InlineKeyboardButton('100000', callback_data='amount 100000'))
     bot.send_message(chat_id,f"Выберите максимальное количество тёзок вашего ребёночка.🥰", reply_markup=markup)
 
 # number of names
-def number_of_names(chat_id):
+def number_of_names(chat_id, check, popularity_check):
+    if check == 1:
+        data = 'number_name'
+    elif check == 2:
+        data = f'number_popular_{popularity_check}'
     markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton('10', callback_data='number 10'))
-    markup.add(InlineKeyboardButton('50', callback_data='number 50'))
-    markup.add(InlineKeyboardButton('100', callback_data='number 100'))
+    markup.add(InlineKeyboardButton('10', callback_data=f'{data} 10'))
+    markup.add(InlineKeyboardButton('50', callback_data=f'{data} 50'))
+    markup.add(InlineKeyboardButton('100', callback_data=f'{data} 100'))
     bot.send_message(chat_id,f"Выберите количество имён которые хотите посмотреть.🥰", reply_markup=markup)
 
 # names output
@@ -78,6 +90,36 @@ def names_amount(ethnicity, gender, amount, number, chat_id):
 @bot.message_handler(commands=['name'])
 def name_an_infant(message):
     generate_markup_ethnicity(message.chat.id)
+
+# most popular names output
+def most_popular_or_rare_names_func(gender, amount, popularity_check, chat_id):
+    if popularity_check == 1:
+        sql = f'''SELECT Names_data.Childs_First_Name, SUM(Names_data.Count) as overall
+                FROM Names_data WHERE Names_data.Gender="{gender}" GROUP BY Names_data.Childs_First_Name
+                ORDER BY overall DESC LIMIT {amount}'''
+    elif popularity_check == 2:
+        sql = f'''SELECT Names_data.Childs_First_Name, SUM(Names_data.Count) as overall
+                FROM Names_data WHERE Names_data.Gender="{gender}" GROUP BY Names_data.Childs_First_Name
+                ORDER BY overall LIMIT {amount}'''
+    data = []
+    result = manager.select_data(sql, data)
+
+    response = ''
+    responselist = ['Имя:  |Названо детей за последние 10 лет:\n']
+    for number,i in enumerate(result):
+        responselist.append(f'{number+1}) {i[0]} : {i[1]}\n')
+    amount = len(responselist) - 1
+    bot.send_message(chat_id, f'''Вот топ {amount} самых популярных имён.🥰
+{response.join(responselist)}''')
+
+# most popular handler
+@bot.message_handler(commands=['most_popular_names'])
+def most_popular_names(message):
+    generate_markup_gender(message.chat.id, 2, 1)
+
+@bot.message_handler(commands=['the_rarest_names'])
+def the_rarest_names(message):
+    generate_markup_gender(message.chat.id, 2, 2)
     
 # callback process
 data = []
@@ -94,25 +136,51 @@ def callback_query(call):
         ethnicity = call.data.replace(f'{key_word}', '').strip()
         data.append(ethnicity)
         # некст гуэшн
-        generate_markup_gender(call.message.chat.id)
-    elif key_word == 'gender':
+        generate_markup_gender(call.message.chat.id, 1, 1)
+    elif key_word == 'gender_name':
         # коррекция параметра
         gender = call.data.split()[1]
         data.append(gender)
         # некст гуэшн
         same_names_question(call.message.chat.id)
+    elif key_word == 'gender_popular_1':
+        # коррекция параметра
+        gender = call.data.split()[1]
+        data.append(gender)
+        # некст гуэшн
+        number_of_names(call.message.chat.id, 2, 1)
+    elif key_word == 'gender_popular_2':
+        # коррекция параметра
+        gender = call.data.split()[1]
+        data.append(gender)
+        # некст гуэшн
+        number_of_names(call.message.chat.id, 2, 2)
     elif key_word == 'amount':
         # коррекция параметра
         amount = int(call.data.split()[1])
         data.append(amount)
         # некст гуэшн
-        number_of_names(call.message.chat.id)
-    elif key_word == 'number':
+        number_of_names(call.message.chat.id, 1, 1)
+    elif key_word == 'number_name':
         # коррекция параметра
         amount = int(call.data.split()[1])
         data.append(amount)
         # ансвер 
         names_amount(data[0], data[1], data[2], data[3], call.message.chat.id)
+        data = []
+    elif key_word == 'number_popular_1':
+        # коррекция параметра
+        amount = int(call.data.split()[1])
+        data.append(amount)
+        # ансвер 
+        most_popular_or_rare_names_func(data[0], data[1], 1, call.message.chat.id)
+        data = []
+    elif key_word == 'number_popular_2':
+        # коррекция параметра
+        amount = int(call.data.split()[1])
+        data.append(amount)
+        # ансвер 
+        most_popular_or_rare_names_func(data[0], data[1], 2, call.message.chat.id)
         data = []
         
     
