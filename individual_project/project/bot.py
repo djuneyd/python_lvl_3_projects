@@ -2,6 +2,7 @@ from logic import DB_Manager
 from config import *
 from telebot import TeleBot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+import random
 
 bot = TeleBot(TOKEN)
 
@@ -16,9 +17,10 @@ def start_command(message):
 На протяжении этих десяти лет велось наблюдение над каждым именем вплоть до того, сколько детей определённой этнической принадлежности в определённый год определённого пола были названы определённым именем!
 У меня хранятся данные 2.338.005-и детишек❗❗❗
 ---------------------------------------------------------------------------
-/name - предложить имя🧐
-/most_popular_names - самые популярные имена🚀
-/the_rarest_names - самые редкие имена🤯
+/name - предложить имя.🧐
+/most_popular_names - самые популярные имена.🚀
+/the_rarest_names - самые редкие имена.🤯
+/random_name - выдаёт рандомное имя по полу.🎲
 """)
 
 # ethnicity question
@@ -38,6 +40,8 @@ def generate_markup_gender(chat_id, check, check_popularity):
         data = 'gender_name'
     elif check == 2:
         data = f'gender_popular_{check_popularity}'
+    elif check == 3:
+        data = f'gender_random'
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton('MALE', callback_data=f'{data} MALE'))
     markup.add(InlineKeyboardButton('FEMALE', callback_data=f'{data} FEMALE'))
@@ -112,6 +116,15 @@ def most_popular_or_rare_names_func(gender, amount, popularity_check, chat_id):
     bot.send_message(chat_id, f'''Вот топ {amount} самых популярных имён.🥰
 {response.join(responselist)}''')
 
+# random name function
+def random_name_function(gender, chat_id):
+    sql = f'SELECT Names_data.Childs_First_Name FROM Names_data WHERE Gender="{gender}"'
+    data = []
+
+    result = random.choice(manager.select_data(sql, data))
+
+    bot.send_message(chat_id, f'''Удача сложилась так, что вам выпало имя: {result[0]}😋''')
+
 # most popular handler
 @bot.message_handler(commands=['most_popular_names'])
 def most_popular_names(message):
@@ -120,6 +133,11 @@ def most_popular_names(message):
 @bot.message_handler(commands=['the_rarest_names'])
 def the_rarest_names(message):
     generate_markup_gender(message.chat.id, 2, 2)
+
+# random name handler
+@bot.message_handler(commands=['random_name'])
+def random_name(message):
+    generate_markup_gender(message.chat.id, 3, 0)
     
 # callback process
 data = []
@@ -155,6 +173,13 @@ def callback_query(call):
         data.append(gender)
         # некст гуэшн
         number_of_names(call.message.chat.id, 2, 2)
+    elif key_word == 'gender_random':
+        # коррекция параметра
+        gender = call.data.split()[1]
+        data.append(gender)
+        # ансвер 
+        random_name_function(data[0], call.message.chat.id)
+        data = []
     elif key_word == 'amount':
         # коррекция параметра
         amount = int(call.data.split()[1])
