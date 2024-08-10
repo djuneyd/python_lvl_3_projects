@@ -1,7 +1,7 @@
-telegram_bot/config.py
 tests.ipynb
-SQL_bot_portfolio/config.py
-AI_translator/config.py
-quiz/config.py
 
 individual_project/project/config.py
+telegram_bot/config.py
+quiz/config.py
+AI_translator/config.py
+SQL_bot_portfolio/config.py
