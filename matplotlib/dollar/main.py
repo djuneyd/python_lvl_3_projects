@@ -24,7 +24,7 @@ def graph(dates, prices):
     plt.ylabel('Цена')
     plt.grid(True)
     # сохранение графика
-    plt.savefig('matplotlib/figure.png')
+    plt.savefig('matplotlib/data/figure.png')
     # Отображаем график
     plt.show()
     
