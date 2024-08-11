@@ -5,7 +5,7 @@ import random
 import sqlite3
 
 def get_data(start_date, end_date):
-    con = sqlite3.connect('matplotlib\dollar\data.db')
+    con = sqlite3.connect('matplotlib_first_project\dollar\data.db')
     cur = con.cursor()
     cur.execute("SELECT * FROM data WHERE date BETWEEN ? AND ? ORDER BY date ", (start_date, end_date))
     res = cur.fetchall()
@@ -24,7 +24,7 @@ def graph(dates, prices):
     plt.ylabel('Цена')
     plt.grid(True)
     # сохранение графика
-    plt.savefig('matplotlib/data/figure.png')
+    plt.savefig('matplotlib_first_project/dollar/figure.png')
     # Отображаем график
     plt.show()
     
