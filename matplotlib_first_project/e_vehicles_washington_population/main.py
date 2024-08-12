@@ -5,7 +5,7 @@ import sqlite3
 
 # getting information
 def info():
-    conn = sqlite3.connect('matplotlib/e_vehicles_washington_population/data/Electric_Vehicle_Population_Data.db')
+    conn = sqlite3.connect('matplotlib_first_project/e_vehicles_washington_population/data/Electric_Vehicle_Population_Data.db')
     check = 0
     with conn:
         cur = conn.cursor()
@@ -47,7 +47,7 @@ def graph(data):
     plt.ylabel('Количества')
     plt.grid(True)
     # сохранение графика
-    plt.savefig('matplotlib/e_vehicles_washington_population/graph.png')
+    plt.savefig('matplotlib_first_project/e_vehicles_washington_population/graph.png')
     # Отображаем график
     plt.show()
     
