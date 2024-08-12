@@ -1,2 +1,2 @@
-API_TOKEN = '7260994225:AAF4OEQxX_j1mhCgdkWLbWxCWNxBZjeXVM8'
+API_TOKEN = '7367513283:AAG26TTFSncHZXCrWmaRgptgf_Qx67FiCSw'
 DATABASE = 'movie_db\data_bases\data.db'
