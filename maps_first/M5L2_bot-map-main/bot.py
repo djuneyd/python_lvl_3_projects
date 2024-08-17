@@ -8,16 +8,22 @@ bot = telebot.TeleBot(TOKEN)
 def handle_start(message):
     bot.send_message(message.chat.id, "Привет! Я бот, который может показывать города на карте. Напиши /help для списка команд.")
 
+commands = ['/start - начать\n', '/help - все команды\n', '/show_city\n', '/remember_city\n', '/show_my_cities\n']
+commands = ''.join(commands)
 @bot.message_handler(commands=['help'])
 def handle_help(message):
-    bot.send_message(message.chat.id, "Доступные команды:  ...")
-    # Допиши команды бота
-
+    global commands
+    bot.send_message(message.chat.id, f"""Привет! Доступные команды:
+{commands}                     """)
 
 @bot.message_handler(commands=['show_city'])
 def handle_show_city(message):
+    # генерируем карту
     city_name = message.text.split()[-1]
-    # Реализуй отрисовку города по запросу
+    manager.create_grapf('maps_first/map.png', [city_name])
+
+    # Отправляем карту
+    bot.send_document(message.chat.id, open('maps_first/map.png', 'rb'))
 
 
 @bot.message_handler(commands=['remember_city'])
