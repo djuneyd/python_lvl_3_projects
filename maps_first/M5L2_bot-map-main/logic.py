@@ -58,7 +58,7 @@ class DB_Map():
             coordinates = cursor.fetchone()
             return coordinates
 
-    def create_grapf(self, path, cities):
+    def create_grapf(self, path, cities, color_user):
         ax = plt.axes(projection=ccrs.PlateCarree())
         ax.stock_img()
 
@@ -66,7 +66,7 @@ class DB_Map():
             cords = self.get_coordinates(city)
             lon, lat = cords
 
-            plt.plot([lat], [lon], color='blue', linewidth=1, marker='o',transform=ccrs.Geodetic())
+            plt.plot([lat], [lon], color=color_user, linewidth=1, marker='o',transform=ccrs.Geodetic())
             plt.text(lat-3, lon-12, city, horizontalalignment='right', transform=ccrs.Geodetic(), fontsize=8)
         plt.savefig(path)
         plt.close()

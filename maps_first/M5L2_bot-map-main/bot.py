@@ -1,6 +1,8 @@
 import telebot
 from config import *
 from logic import *
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+import requests
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -16,15 +18,21 @@ def handle_help(message):
     bot.send_message(message.chat.id, f"""Привет! Доступные команды:
 {commands}                     """)
 
+def color_markup(chat_id):
+    data = 'color'
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton('🔵', callback_data=f'{data} Blue'))
+    markup.add(InlineKeyboardButton('🔴', callback_data=f'{data} Red'))
+    markup.add(InlineKeyboardButton('🟢', callback_data=f'{data} Green'))
+    bot.send_message(chat_id,f"Выберите цвет маркеров!", reply_markup=markup)
+
+goroda = []
 @bot.message_handler(commands=['show_city'])
 def handle_show_city(message):
     # генерируем карту
     city_name = message.text.split()[-1].capitalize()
-    manager.create_grapf('maps_first/map.png', [city_name])
-
-    # Отправляем карту
-    bot.send_document(message.chat.id, open('maps_first/map.png', 'rb'))
-
+    goroda.append(city_name)
+    color_markup(message.chat.id)
 
 @bot.message_handler(commands=['remember_city'])
 def handle_remember_city(message):
@@ -37,14 +45,49 @@ def handle_remember_city(message):
 
 @bot.message_handler(commands=['show_my_cities'])
 def handle_show_visited_cities(message):
+    global goroda
     # генерируем карту
     cities = manager.select_cities(message.chat.id)
-    manager.create_grapf('maps_first/map.png', cities)
+    goroda = cities
+    color_markup(message.chat.id)
 
-    # Отправляем карту
-    bot.send_document(message.chat.id, open('maps_first/map.png', 'rb'))
     
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    global goroda
+    # удаление инлайн клавы
+    bot.delete_message(call.message.chat.id, call.message.message_id)
+    # ключевое слово
+    key_word = call.data.split()[0]
+    # обработка
+    if key_word == 'color':
+        # коррекция параметра
+        color = call.data.split()[1]
+        manager.create_grapf('maps_first/map.png', goroda, color)
+        # время
+        try:
+            if len(goroda) == 1:
+                conn = sqlite3.connect(manager.database)
+                with conn:
+                    cursor = conn.cursor()
+                    cursor.execute('''SELECT country
+                                    FROM cities  
+                                    WHERE city = ?''', (*goroda,))
+                    country = cursor.fetchone()
+                country = country[0][0:2].upper()
+                url = 'https://api.openweathermap.org/data/2.5/weather?q='+goroda[0]+', '+country+'&units=metric&lang=ru&appid=79d1ca96933b0328e1c7e3e7a26cb347'
+                print(url)
+                weather_data = requests.get(url).json()
+                temperature = round(weather_data['main']['temp'])
+                temperature_feels = round(weather_data['main']['feels_like'])
+                forecast = [goroda[0], str(temperature), str(temperature_feels)]
+                bot.send_message(call.message.chat.id, f'Город: {forecast[0]}, Температура: {forecast[1]}°C, Ощущается как: {forecast[2]}°C')
+        except:
+            goroda = []
+        goroda = []
 
+        # Отправляем карту
+        bot.send_document(call.message.chat.id, open('maps_first/map.png', 'rb'))
 
 if __name__=="__main__":
     manager = DB_Map(DATABASE)
