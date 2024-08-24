@@ -1,27 +1,28 @@
 import cv2
-import numpy as np
 
-# Загрузка изображения
-image = cv2.imread('путь_к_изображению')
+# Захват видео из файла
+cap = cv2.VideoCapture('open_cv/images/Rick Roll.mp4')
 
-# Проверка, что изображение успешно загружено
-if image is None:
-    print("Ошибка загрузки изображения.")
+# Проверка, что видео успешно открыто
+if not cap.isOpened():
+    print("Ошибка открытия видеофайла.")
 else:
-    # Создание сепия фильтра
-    sepia_filter = np.array([[0.272, 0.534, 0.131],
-                             [0.349, 0.686, 0.168],
-                             [0.393, 0.769, 0.189]])
-    
-    # Применение фильтра к изображению
-    sepia_image = cv2.transform(image, sepia_filter)
+    while True:
+        # Чтение кадра из видео
+        ret, frame = cap.read()
+        
+        # Проверка, что кадр был успешно прочитан
+        if not ret:
+            print("Завершение видео или ошибка чтения кадра.")
+            break
+        
+        # Отображение кадра
+        cv2.imshow('Video Frame', frame)
+        
+        # Ожидание 25 мс между кадрами и возможность завершения по нажатию клавиши 'q'
+        if cv2.waitKey(25) & 0xFF == ord('q'):
+            break
 
-    # Ограничение значений от 0 до 255
-    sepia_image = np.clip(sepia_image, 0, 255).astype(np.uint8)
-    
-    # Сохранение и отображение изображения
-    cv2.imwrite('output_sepia.jpg', sepia_image)
-    cv2.imshow('Sepia Image', sepia_image)
-    
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+# Освобождение ресурсов после завершения работы с видео
+cap.release()
+cv2.destroyAllWindows()
