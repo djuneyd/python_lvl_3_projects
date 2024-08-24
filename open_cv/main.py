@@ -1,28 +1,27 @@
 import cv2
 
-# Захват видео из файла
-cap = cv2.VideoCapture('open_cv/images/Rick Roll.mp4')
+# Загрузка изображений
+background = cv2.imread('open_cv/images/scenery.png')  # Основное изображение
+overlay = cv2.imread('open_cv/images/abstractionizm.png')        # Изображение, которое будет наложено
 
-# Проверка, что видео успешно открыто
-if not cap.isOpened():
-    print("Ошибка открытия видеофайла.")
+# Проверка успешной загрузки изображений
+if background is None or overlay is None:
+    print("Ошибка загрузки изображений.")
 else:
-    while True:
-        # Чтение кадра из видео
-        ret, frame = cap.read()
-        
-        # Проверка, что кадр был успешно прочитан
-        if not ret:
-            print("Завершение видео или ошибка чтения кадра.")
-            break
-        
-        # Отображение кадра
-        cv2.imshow('Video Frame', frame)
-        
-        # Ожидание 25 мс между кадрами и возможность завершения по нажатию клавиши 'q'
-        if cv2.waitKey(25) & 0xFF == ord('q'):
-            break
+    # Определение размера overlay
+    h, w = overlay.shape[:2]
 
-# Освобождение ресурсов после завершения работы с видео
-cap.release()
-cv2.destroyAllWindows()
+    # Определение позиции для наложения (верхний левый угол)
+    x, y = 50, 50  # Позиция верхнего левого угла overlay на background
+
+    # Проверка, что overlay помещается на background
+    if x + w <= background.shape[1] and y + h <= background.shape[0]:
+        # Наложение изображения
+        background[y:y+h, x:x+w] = overlay
+
+        # Сохранение и отображение результата
+        cv2.imshow('Result', background)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    else:
+        print("Overlay image не помещается на фон.")
