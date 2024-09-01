@@ -29,4 +29,11 @@ def process_image(image_path, output_path):
 
 
 # Проверяем работу кода
-process_image("M5L4_bot-main/images/face.png", "M5L4_bot-main/images/output.png")
+if __name__ == "__main__":
+    # Путь к изображению для обработки
+    image_path = "M5L4_bot-main/images/face.png"
+    # Путь к изображению с размытыми лицами
+    output_path = "M5L4_bot-main/images/output.png"
+
+    # Вызов функции обработки изображения
+    process_image(image_path, output_path)
