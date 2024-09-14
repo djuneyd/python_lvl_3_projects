@@ -5,6 +5,7 @@ import requests
 import base64
 from PIL import Image
 from io import BytesIO
+from config import *
 
 # generating images using fusion brain
 # documentation --> https://fusionbrain.ai/docs/ru/doc/api-dokumentaciya/
@@ -54,7 +55,7 @@ class Text2ImageAPI:
 
 
 if __name__ == '__main__':
-    api = Text2ImageAPI('https://api-key.fusionbrain.ai/', '9EF57297B1D005F620CABC165CA5B122', '312091F088C1DDDCF18203B05B70FECA')
+    api = Text2ImageAPI('https://api-key.fusionbrain.ai/', AI_KEY_1, AI_KEY_2)
     model_id = api.get_model()
     uuid = api.generate("Пушистый кот в очках", model_id)
     images = api.check_generation(uuid)[0]
