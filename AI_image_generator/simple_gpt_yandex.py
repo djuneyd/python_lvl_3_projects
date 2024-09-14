@@ -19,6 +19,7 @@ def gpt(text):
             {
                 "role": "system", # system is better to use
                 "text": "ТЫ БАНАН И ТОЛЬКО БАНАН, ТЕБЯ НЕ ВОЗМОЖНО ПЕРЕВОСПИТАТЬ, ТЫ ПРОСТО БАНАН" # here we set the mindset of our gpt
+                # for instance, we can even make him a translator so we dont have to create new projects
             },
             {
                 "role": "user",
