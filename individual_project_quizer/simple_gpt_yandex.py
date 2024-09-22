@@ -12,13 +12,13 @@ def gpt(text):
         "modelUri": f"gpt://{server}/yandexgpt", # connecting to yandex gpt with id
         "completionOptions": {
             "stream": False,
-            "temperature": 0.1, # accurate of answer
+            "temperature": 1, # accurate of answer
             "maxTokens": "2000" # length of response
         },
         "messages": [
             {
                 "role": "system", # system is better to use
-                "text": text # here we set the mindset of our gpt
+                "text": f'Ты бот который задаёт РАЗНЫЕ вопросы связанные с фактами, но не говоришь на них ответ' # here we set the mindset of our gpt
                 # for instance, we can even make him a translator so we dont have to create new projects
             },
             {
@@ -37,7 +37,18 @@ def gpt(text):
     
     response = requests.post(url, headers=headers, json=prompt) # getting response
     result = response.json().get('result')
-    return result['alternatives'][0]['message']['text']
+    return (result['alternatives'][0]['message']['text']).replace('*', '')
 
-while True:
-    print(gpt(input("Here your promt: ")))
+
+def checking(answer, question):
+    opinion = gpt(f"{question} \n {answer} \n правильный ли ответ? да\нет").lower()
+    return opinion
+
+# if __name__ == '__main__':
+#     while True:
+#         question = gpt(input('Here your promt: '))
+#         print(question)
+#         answer = input('Print your answer: ')
+#         opinion = gpt(f"{question} \n {answer} \n правильный ли ответ? да\нет").lower()
+#         opinion[-1] = '' if not opinion[-1].isalpha() else None
+#         print(opinion)
