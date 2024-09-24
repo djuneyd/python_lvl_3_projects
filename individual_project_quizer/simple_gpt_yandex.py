@@ -37,7 +37,10 @@ def gpt(text):
     
     response = requests.post(url, headers=headers, json=prompt) # getting response
     result = response.json().get('result')
-    return (result['alternatives'][0]['message']['text']).replace('*', '')
+    try:
+        return result['alternatives'][0]['message']['text']
+    except:
+        return gpt('Задай вопрос')
 
 
 def checking(answer, question):
