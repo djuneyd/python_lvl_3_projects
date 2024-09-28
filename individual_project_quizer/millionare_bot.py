@@ -10,7 +10,8 @@ def greeting(message):
     bot.send_message(message.chat.id, '''ДОБРО ПОЖАЛОВАТЬ В ИГРУ КТО ХОЧЕТ СТАТЬ МИЛЛИОНЕРОМ!🎲
 ЦЕЛЬ ИГРЫ ОТВЕТИТЬ НА 5 ВОПРОСОВ И ЗАБРАТЬ МАКСИМАЛЬНЫЙ ВЫИГРЫШ!
 /new_game - начать новую игру💰
-/check_balance - посмотреть баланс.💰''')
+/check_balance - посмотреть баланс.💰
+/leaderboard - посмотреть рейтинг богатейших🤑''')
     
     data = ()
     if message.from_user.id not in tracker.select_data('SELECT user_id FROM user_stats', data)[0]:
@@ -33,7 +34,7 @@ def question_repetition(message):
     # print('entered')
     global ingame_info
     gpt_response = checking(message.text, ingame_info[f'{message.from_user.id}quest'])
-    #print(gpt_response)
+    print(gpt_response)
     if gpt_response == False:
         print('error')
         bot.send_message(message.chat.id, "Ошибка: gpt не ответил😭. Пожалуйста начните новую игру.")
