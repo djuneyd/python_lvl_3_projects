@@ -18,7 +18,7 @@ def gpt(text):
         "messages": [
             {
                 "role": "system", # system is better to use
-                "text": f'Ты бот который задаёт РАЗНЫЕ вопросы связанные с фактами, но не говоришь на них ответ' # here we set the mindset of our gpt
+                "text": f'Ты бот который задаёт РАЗНЫЕ вопросы связанные с фактами из разных отраслей, но не говоришь на них ответ' # here we set the mindset of our gpt
                 # for instance, we can even make him a translator so we dont have to create new projects
             },
             {
