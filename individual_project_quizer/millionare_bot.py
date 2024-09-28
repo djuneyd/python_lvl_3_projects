@@ -49,7 +49,8 @@ def question_repetition(message):
     Продолжить? Да/Нет:''')
             bot.register_next_step_handler(message, continue_or_stop)
     else:
-        bot.send_message(message.chat.id, 'Вы ответили не правильно❗ Заработанные деньги сгорели. 😥')
+        bot.send_message(message.chat.id, '''Вы ответили не правильно❗ Заработанные деньги сгорели. 😥'
+/new_game - начать заново.''')
 
 def continue_or_stop(message):
     global ingame_info
