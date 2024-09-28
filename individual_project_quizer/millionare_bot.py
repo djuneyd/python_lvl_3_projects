@@ -83,6 +83,15 @@ def view_leaderboard(message):
     for i in range(len(res)):
         leaderboard.append(f'{i+1}) @{res[i][0]}: {res[i][1]}$ \n')       
     bot.send_message(message.chat.id, ''.join(leaderboard))
+
+@bot.message_handler(func=lambda message: True)
+def echo(message):
+    bot.send_message(message.chat.id, '''ДОБРО ПОЖАЛОВАТЬ В ИГРУ КТО ХОЧЕТ СТАТЬ МИЛЛИОНЕРОМ!🎲
+ЦЕЛЬ ИГРЫ ОТВЕТИТЬ НА 5 ВОПРОСОВ И ЗАБРАТЬ МАКСИМАЛЬНЫЙ ВЫИГРЫШ!
+/new_game - начать новую игру💰
+/check_balance - посмотреть баланс.💰
+/leaderboard - посмотреть рейтинг богатейших🤑''')
+
     
 if __name__ == '__main__':
     tracker = MoneyTracker(DATABASE)
