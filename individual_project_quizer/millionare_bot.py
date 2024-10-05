@@ -14,7 +14,11 @@ def greeting(message):
 /leaderboard - посмотреть рейтинг богатейших🤑''')
     
     data = ()
-    if message.from_user.id not in tracker.select_data('SELECT user_id FROM user_stats', data)[0]:
+    users = tracker.select_data('SELECT user_id FROM user_stats', data)
+    userslist = []
+    for i in users:
+        userslist.append(i[0])
+    if message.from_user.id not in userslist:
         tracker.executemany('INSERT INTO user_stats (user_id, username, total_money) VALUES (?, ?, ?)', (message.from_user.id, message.from_user.username, 0))
 
 ingame_info = {}
@@ -34,7 +38,7 @@ def question_repetition(message):
     # print('entered')
     global ingame_info
     gpt_response = checking(message.text, ingame_info[f'{message.from_user.id}quest'])
-    print(gpt_response)
+    #print(gpt_response)
     if gpt_response == False:
         print('error')
         bot.send_message(message.chat.id, "Ошибка: gpt не ответил😭. Пожалуйста начните новую игру.")
@@ -63,7 +67,7 @@ def continue_or_stop(message):
         ingame_info[f'{message.from_user.id}questionc'] += 1
         bot.register_next_step_handler(message, question_repetition)
     elif answer == 'нет':
-        bot.send_message(message.chat.id, f'Игра окончена❗ Ваш баланс пополнен на +{ingame_info[f'{message.from_user.id}money']}')
+        bot.send_message(message.chat.id, f'Игра окончена❗ Ваш баланс пополнен на +{ingame_info[f'{message.from_user.id}money']}$')
 
         current_money = tracker.select_data(f'SELECT total_money FROM user_stats WHERE user_id = {message.from_user.id}', ())[0][0]
         tracker.executemany(f'UPDATE user_stats SET total_money = {current_money+ingame_info[f'{message.from_user.id}money']} WHERE user_id = {message.from_user.id}', ())
