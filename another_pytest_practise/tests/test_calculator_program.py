@@ -1,6 +1,17 @@
 import pytest
 from calculate.calculator_program import calculate
 
+# to create html reports for the program
+# 1 download essential tools
+
+# pip install pytest pytest-cov
+# pip install pytest pytest-html
+
+# 2 go to the repository of your project and execute
+
+# pytest --html=test_report.html
+# pytest --cov=. --cov-report html
+
 def test_calculate_addition():
     assert calculate(1, 1, '+') == 2
 
