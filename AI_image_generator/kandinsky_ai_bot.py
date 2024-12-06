@@ -1,4 +1,5 @@
 from telebot import TeleBot
+from telebot import types
 from config import *
 from logic import Text2ImageAPI
 
@@ -8,6 +9,11 @@ from io import BytesIO
 import time
 
 bot = TeleBot(TOKEN)
+
+bot = TeleBot(TOKEN)
+c1 = types.BotCommand(command='start', description='Start the Bot')
+c2 = types.BotCommand(command='genim', description='Generate an image')
+bot.set_my_commands([c1,c2])
 
 @bot.message_handler(commands=['help', 'start'])
 def start_command(message):
@@ -32,7 +38,7 @@ def generation_with_promt(message):
 
     bot.send_chat_action(message.chat.id, 'typing') # typing animation
     time.sleep(0.5)
-    bot.send_message(message.chat.id, 'Generating image...')  # informing user about generation process
+    bot.send_message(message.chat.id, 'Generating an image...')  # informing user about generation process
     bot.send_chat_action(message.chat.id, 'typing') # typing animation
     # connecting to ai and generating
     model_id = api.get_model()
